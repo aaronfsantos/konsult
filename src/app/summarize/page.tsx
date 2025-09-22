@@ -1,20 +1,53 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { summarizePolicy as runSummarizePolicy } from '@/ai/flows/policy-summarization';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { Loader2, FileText } from 'lucide-react';
+import { Loader2, FileText, UploadCloud } from 'lucide-react';
 import { FeedbackButtons } from '@/components/feedback-buttons';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useDropzone } from 'react-dropzone';
 
 export default function SummarizePage() {
   const [policyDocument, setPolicyDocument] = useState('');
+  const [fileName, setFileName] = useState('');
   const [summary, setSummary] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [fileError, setFileError] = useState('');
+
+  const onDrop = useCallback((acceptedFiles: File[], fileRejections: any[]) => {
+    setFileError('');
+    if (fileRejections.length > 0) {
+      setFileError('File is too large or not a valid type. Please upload a text file under 2MB.');
+      return;
+    }
+
+    if (acceptedFiles.length > 0) {
+      const file = acceptedFiles[0];
+      setFileName(file.name);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target?.result as string;
+        setPolicyDocument(text);
+      };
+      reader.onerror = () => {
+        setFileError('Error reading file.');
+      };
+      reader.readAsText(file);
+    }
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'text/plain': ['.txt', '.md'],
+    },
+    maxSize: 2 * 1024 * 1024, // 2MB
+    multiple: false,
+  });
 
   const handleSummarize = async () => {
     if (!policyDocument.trim()) return;
@@ -33,6 +66,12 @@ export default function SummarizePage() {
       setIsLoading(false);
     }
   };
+  
+  const handleRemoveFile = () => {
+    setPolicyDocument('');
+    setFileName('');
+    setFileError('');
+  };
 
   return (
     <div className="p-4 md:p-6 space-y-6 h-full flex flex-col">
@@ -45,17 +84,34 @@ export default function SummarizePage() {
         <Card className="flex flex-col">
           <CardHeader>
             <CardTitle>Policy Document</CardTitle>
-            <CardDescription>Paste the full text of the policy document below.</CardDescription>
+            <CardDescription>Drag and drop a document file below or click to upload.</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex">
-            <Textarea
-              value={policyDocument}
-              onChange={(e) => setPolicyDocument(e.target.value)}
-              placeholder="Paste your policy document here..."
-              className="w-full h-full min-h-[300px] resize-none"
-              disabled={isLoading}
-            />
+            <div {...getRootProps()} className={cn('w-full h-full min-h-[300px] flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer transition-colors', isDragActive ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50')}>
+              <input {...getInputProps()} />
+              {policyDocument ? (
+                <div className="text-center">
+                  <FileText className="mx-auto h-12 w-12 text-primary"/>
+                  <p className="mt-2 font-semibold">{fileName}</p>
+                  <p className="text-sm text-muted-foreground">File ready to be summarized.</p>
+                  <Button variant="link" size="sm" onClick={handleRemoveFile} className="mt-2">Remove file</Button>
+                </div>
+              ) : (
+                <div className="text-center text-muted-foreground">
+                  <UploadCloud className="mx-auto h-12 w-12"/>
+                  <p className="mt-2 font-semibold">Drop your file here or click to browse</p>
+                  <p className="text-sm">Supports: .txt, .md (max. 2MB)</p>
+                </div>
+              )}
+            </div>
           </CardContent>
+           {fileError && (
+              <div className="px-6 pb-2 -mt-4">
+                <Alert variant="destructive" className="py-2">
+                    <AlertDescription>{fileError}</AlertDescription>
+                </Alert>
+              </div>
+            )}
           <CardFooter>
             <Button onClick={handleSummarize} disabled={isLoading || !policyDocument.trim()}>
               {isLoading ? (
@@ -109,3 +165,8 @@ export default function SummarizePage() {
     </div>
   );
 }
+
+function cn(...classes: (string | boolean | undefined | null)[]) {
+  return classes.filter(Boolean).join(' ');
+}
+
