@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -10,10 +10,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, BookOpen } from 'lucide-react';
+import { Loader2, BookOpen, UploadCloud, FileText } from 'lucide-react';
 import { FeedbackButtons } from '@/components/feedback-buttons';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useDropzone } from 'react-dropzone';
+import { cn } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
 
 const formSchema = z.object({
   role: z.string().min(2, { message: 'Role must be at least 2 characters.' }),
@@ -25,6 +28,8 @@ export default function OnboardingPage() {
   const [guide, setGuide] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [fileName, setFileName] = useState('');
+  const [fileError, setFileError] = useState('');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -33,6 +38,41 @@ export default function OnboardingPage() {
       projects: '',
       internalDocumentation: '',
     },
+  });
+
+  const onDrop = useCallback((acceptedFiles: File[], fileRejections: any[]) => {
+    setFileError('');
+    if (fileRejections.length > 0) {
+      setFileError('File is too large or not a valid type. Please upload a text file under 2MB.');
+      setFileName('');
+      form.setValue('internalDocumentation', '');
+      return;
+    }
+
+    if (acceptedFiles.length > 0) {
+      const file = acceptedFiles[0];
+      setFileName(file.name);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target?.result as string;
+        form.setValue('internalDocumentation', text);
+      };
+      reader.onerror = () => {
+        setFileError('Error reading file.');
+        setFileName('');
+        form.setValue('internalDocumentation', '');
+      };
+      reader.readAsText(file);
+    }
+  }, [form]);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'text/plain': ['.txt', '.md'],
+    },
+    maxSize: 2 * 1024 * 1024, // 2MB
+    multiple: false,
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -54,6 +94,13 @@ export default function OnboardingPage() {
       setIsLoading(false);
     }
   }
+
+  const handleRemoveFile = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFileName('');
+    setFileError('');
+    form.setValue('internalDocumentation', '');
+  };
 
   return (
     <div className="p-4 md:p-6 space-y-6 h-full flex flex-col">
@@ -105,12 +152,45 @@ export default function OnboardingPage() {
                       <FormLabel>Internal Documentation (Optional)</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Provide links or summaries of relevant documentation..."
+                          placeholder="Paste links or summaries of relevant documentation..."
                           className="resize-none"
                           {...field}
                           disabled={isLoading}
+                          value={fileName ? `File uploaded: ${fileName}` : field.value}
+                          onChange={(e) => {
+                            if (!fileName) {
+                                field.onChange(e);
+                            }
+                          }}
+                          onFocus={() => {
+                            if(fileName) {
+                                setFileName('');
+                                field.onChange('');
+                            }
+                          }}
                         />
                       </FormControl>
+                      <div className="relative flex justify-center my-4">
+                        <Separator className="absolute inset-0 top-1/2 -translate-y-1/2" />
+                        <span className="relative bg-card px-2 text-sm text-muted-foreground">OR</span>
+                      </div>
+                      <div {...getRootProps()} className={cn('relative w-full h-32 flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer transition-colors', isDragActive ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50')}>
+                        <input {...getInputProps()} />
+                        {fileName ? (
+                           <div className="text-center">
+                             <FileText className="mx-auto h-8 w-8 text-primary"/>
+                             <p className="mt-1 font-semibold text-sm">{fileName}</p>
+                             <Button variant="link" size="sm" onClick={handleRemoveFile} className="mt-0 text-xs h-auto py-0">Remove file</Button>
+                           </div>
+                        ) : (
+                          <div className="text-center text-muted-foreground">
+                            <UploadCloud className="mx-auto h-8 w-8"/>
+                            <p className="mt-2 text-sm font-semibold">Drop a file here or click to browse</p>
+                            <p className="text-xs">Supports: .txt, .md (max. 2MB)</p>
+                          </div>
+                        )}
+                      </div>
+                       {fileError && <p className="text-sm font-medium text-destructive">{fileError}</p>}
                       <FormMessage />
                     </FormItem>
                   )}
