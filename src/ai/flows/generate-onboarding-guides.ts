@@ -10,12 +10,13 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { getJiraProjectDetailsTool } from './get-jira-project';
 
 const GenerateOnboardingGuideInputSchema = z.object({
   role: z.string().describe('The role of the new employee.'),
   projects: z
     .string()
-    .describe('The projects the new employee will be working on.'),
+    .describe('The projects the new employee will be working on. This might be a project key or name.'),
   internalDocumentation: z
     .string()
     .describe('Available internal documentation for onboarding.'),
@@ -41,9 +42,12 @@ const prompt = ai.definePrompt({
   name: 'generateOnboardingGuidePrompt',
   input: {schema: GenerateOnboardingGuideInputSchema},
   output: {schema: GenerateOnboardingGuideOutputSchema},
+  tools: [getJiraProjectDetailsTool],
   prompt: `You are an expert in creating onboarding guides for new employees.
 
   Based on the employee's role, the projects they will be working on, and the available internal documentation, create a step-by-step onboarding guide.
+
+  If the project name looks like a Jira Project Key, use the getJiraProjectDetails tool to get more information about the project and use that to create a more detailed and useful onboarding guide.
 
   Role: {{{role}}}
   Projects: {{{projects}}}
