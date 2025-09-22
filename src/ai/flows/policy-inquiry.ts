@@ -9,6 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import { getPolicies } from '@/services/policy-service';
 import {z} from 'genkit';
 
 const PolicyInquiryInputSchema = z.object({
@@ -27,12 +28,20 @@ export async function policyInquiry(input: PolicyInquiryInput): Promise<PolicyIn
 
 const prompt = ai.definePrompt({
   name: 'policyInquiryPrompt',
-  input: {schema: PolicyInquiryInputSchema},
+  input: {schema: z.object({
+    query: z.string(),
+    context: z.string(),
+  })},
   output: {schema: PolicyInquiryOutputSchema},
-  prompt: `You are a helpful assistant that answers questions about company policies.
+  prompt: `You are a helpful assistant that answers questions about company policies based on the provided context.
 
-  Use the following information to answer the question:
-  {{query}}`,
+  Context:
+  {{{context}}}
+
+  Question:
+  {{query}}
+  
+  Answer the question based *only* on the context provided. If the answer is not available in the context, say "I'm sorry, I don't have information about that policy."`,
 });
 
 const policyInquiryFlow = ai.defineFlow(
@@ -42,7 +51,13 @@ const policyInquiryFlow = ai.defineFlow(
     outputSchema: PolicyInquiryOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const policies = await getPolicies();
+    const context = policies.map(p => `## ${p.title}\n${p.content}`).join('\n\n');
+
+    const {output} = await prompt({
+      query: input.query,
+      context: context,
+    });
     return output!;
   }
 );
