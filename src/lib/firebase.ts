@@ -4,10 +4,10 @@ import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  apiKey: "AIzaSyDmkexWvFuzHfFmE2-qw_4FlQ_91Ixz8b4",
+  authDomain: "klb-cd-konsult-dev-1.firebaseapp.com",
+  projectId: "klb-cd-konsult-dev-1",
+  storageBucket: "klb-cd-konsult-dev-1.appspot.com",
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
