@@ -70,9 +70,17 @@ export default function Home() {
                 <CardHeader>
                   <CardTitle>Welcome to Konsult!</CardTitle>
                   <CardDescription>
-                    Start a conversation by typing your question below. For example: "What is our policy on remote work?"
+                    To get started, you need to upload your company's policy documents to Firebase Storage.
                   </CardDescription>
                 </CardHeader>
+                <CardContent>
+                  <ol className="list-decimal list-inside space-y-2 text-sm">
+                    <li>Go to the <a href={`https://console.firebase.google.com/project/${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}/storage`} target="_blank" rel="noopener noreferrer" className="text-primary underline">Firebase Storage console</a>.</li>
+                    <li>Create a folder named <strong>policies</strong>.</li>
+                    <li>Upload your plain text (.txt) or markdown (.md) policy files into the `policies` folder.</li>
+                    <li>Once uploaded, come back here and ask a question, like "What is our policy on remote work?"</li>
+                  </ol>
+                </CardContent>
               </Card>
             )}
             {messages.map((msg, index) => (
