@@ -30,6 +30,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+        config.externals = {
+            ...config.externals,
+            'pdf-parse': 'pdf-parse',
+        };
+    }
+    return config;
+  }
 };
 
 export default nextConfig;
