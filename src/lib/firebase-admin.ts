@@ -27,7 +27,7 @@ if (!admin.apps.length) {
         clientEmail: clientEmail,
         // The private key needs to be properly formatted.
         // The value from the JSON file needs to be parsed, often replacing \\n with \n
-        privateKey: privateKey,
+        privateKey: privateKey.replace(/\\n/g, '\n'),
       }),
       storageBucket: storageBucket,
     });
