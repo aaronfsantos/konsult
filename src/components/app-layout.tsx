@@ -30,8 +30,8 @@ import { useEffect } from 'react';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user, loading, signOut } = useAuth();
-  const router = useRouter();
+  // const { user, loading, signOut } = useAuth();
+  // const router = useRouter();
 
   const menuItems = [
     {
@@ -51,6 +51,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     },
   ];
 
+  /*
   useEffect(() => {
     if (loading) {
       return;
@@ -74,6 +75,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   if (!user && pathname === '/login') {
     return <>{children}</>;
   }
+  */
 
   return (
     <SidebarProvider>
@@ -106,6 +108,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             ))}
           </SidebarMenu>
         </SidebarContent>
+        {/*
         <SidebarFooter>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -128,6 +131,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </DropdownMenuContent>
             </DropdownMenu>
         </SidebarFooter>
+        */}
       </Sidebar>
       <SidebarInset>{children}</SidebarInset>
     </SidebarProvider>
