@@ -2,11 +2,17 @@
 
 import { storage } from '@/lib/firebase';
 import { ref, listAll, getBytes } from 'firebase/storage';
+import pdf from 'pdf-parse';
 
 export interface Policy {
   id: string;
   title: string;
   content: string;
+}
+
+async function extractTextFromPdf(pdfBuffer: Buffer): Promise<string> {
+  const data = await pdf(pdfBuffer);
+  return data.text;
 }
 
 export async function getPolicies(): Promise<Policy[]> {
@@ -17,9 +23,15 @@ export async function getPolicies(): Promise<Policy[]> {
     const policies = await Promise.all(
       policySnapshot.items.map(async (itemRef) => {
         const bytes = await getBytes(itemRef);
-        const content = new TextDecoder().decode(bytes);
-        // Use the file name (without extension) as the title
+        const buffer = Buffer.from(bytes);
+        let content = '';
         const title = itemRef.name.replace(/\.[^/.]+$/, "");
+
+        if (itemRef.name.toLowerCase().endsWith('.pdf')) {
+          content = await extractTextFromPdf(buffer);
+        } else {
+          content = buffer.toString('utf-8');
+        }
 
         return {
           id: itemRef.name,
