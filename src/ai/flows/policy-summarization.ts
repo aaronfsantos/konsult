@@ -31,9 +31,19 @@ const prompt = ai.definePrompt({
   name: 'summarizePolicyPrompt',
   input: {schema: SummarizePolicyInputSchema},
   output: {schema: SummarizePolicyOutputSchema},
-  prompt: `You are an expert policy summarizer. You will be given a long policy document and you must summarize it into a concise summary that covers all the key points.
+  prompt: `You are an expert policy summarizer. Your task is to distill long policy documents into concise summaries that cover all key points.
 
-The summary should be no more than 200 words and formatted as a clean, well-structured paragraph.
+The summary must be no more than 200 words and formatted into clean, well-structured paragraphs with a blank line separating them.
+
+Here is an example of a good summary:
+
+The company's updated remote work policy provides employees with the flexibility to work from home, a co-working space, or the office, subject to manager approval. To be eligible, employees must have been with the company for at least six months and maintain a satisfactory performance record.
+
+Requests for remote work arrangements must be submitted through the internal HR portal at least two weeks in advance. The company will provide essential equipment, but employees are responsible for ensuring a safe and productive home office environment.
+
+---
+
+Now, please summarize the following policy document.
 
 Policy Document:
 {{{policyDocument}}}`,
