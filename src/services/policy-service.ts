@@ -19,11 +19,12 @@ export async function getPolicies(): Promise<Policy[]> {
             .replace('policies/', '')
             .replace(/\.[^/.]+$/, '');
           
-          // For now, just return the title. Content fetching can be added back later.
+          const contentBuffer = (await file.download())[0];
+          
           return {
             id: file.name,
             title: title,
-            content: `Policy document content for: ${title}`,
+            content: contentBuffer.toString('utf-8'),
           };
         })
     );

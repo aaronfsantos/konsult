@@ -54,9 +54,8 @@ const policyInquiryFlow = ai.defineFlow(
     try {
       const policies = await getPolicies();
       
-      if (policies.length > 0) {
-        const policyTitles = policies.map(p => p.title).join(', ');
-        return { answer: `I found the following policy files: ${policyTitles}` };
+      if (policies.length === 0) {
+        return { answer: "I couldn't find any policy documents in the knowledge base. Please make sure policy files are uploaded to the 'policies/' directory in Firebase Storage." };
       }
 
       const context = policies.map(p => `## ${p.title}\n${p.content}`).join('\n\n');
