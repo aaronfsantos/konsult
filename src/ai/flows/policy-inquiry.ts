@@ -33,7 +33,9 @@ const prompt = ai.definePrompt({
     context: z.string(),
   })},
   output: {schema: PolicyInquiryOutputSchema},
-  prompt: `You are a helpful assistant that answers questions about company policies based on the provided context.
+  prompt: `You are a helpful assistant that answers questions about company policies.
+
+  Use the provided context to answer the user's question.
 
   Context:
   {{{context}}}
@@ -41,7 +43,7 @@ const prompt = ai.definePrompt({
   Question:
   {{query}}
   
-  Answer the question based *only* on the context provided. If the answer is not available in the context, say "I'm sorry, I don't have information about that policy."`,
+  Format your answer in a clear and easy-to-read way, using paragraphs for separation. The answer should be based *only* on the context provided. If the answer is not available in the context, say "I'm sorry, I don't have information about that policy."`,
 });
 
 const policyInquiryFlow = ai.defineFlow(
@@ -66,7 +68,8 @@ const policyInquiryFlow = ai.defineFlow(
       });
       return output!;
 
-    } catch (error: any) {
+    } catch (error: any)
+      {
       console.error("Error in policyInquiryFlow:", error);
       return { answer: `There was an error connecting to the knowledge base. Please check the storage configuration and permissions. \n\n**Error Details:**\n\`\`\`\n${error.message}\n\`\`\`` };
     }
