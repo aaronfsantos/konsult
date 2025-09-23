@@ -1,32 +1,37 @@
 'use server';
 
-import { storage } from '@/lib/firebase';
-import { ref, listAll } from 'firebase/storage';
-
-export interface Policy {
-  id: string;
-  title: string;
-  content: string;
-}
+import { storage } from '@/lib/firebase-admin';
+import { Policy } from '@/models/policy';
 
 /**
  * Fetches policies from Firebase Storage.
- * Currently, it only fetches the titles of the policies.
- * Content fetching and parsing is disabled for debugging.
  */
 export async function getPolicies(): Promise<Policy[]> {
-  const policiesRef = ref(storage, 'policies');
-  const policySnapshot = await listAll(policiesRef);
-  
-  const policies = policySnapshot.items.map((itemRef) => {
-    const title = itemRef.name.replace(/\.[^/.]+$/, "");
-    return {
-      id: itemRef.name,
-      title: title,
-      // Content is intentionally left blank for now to test storage access.
-      content: `Policy document: ${title}`,
-    };
-  });
-  
-  return policies;
+  try {
+    const bucket = storage.bucket();
+    const [files] = await bucket.getFiles({ prefix: 'policies/' });
+
+    const policies: Policy[] = await Promise.all(
+      files
+        .filter(file => file.name !== 'policies/') // Filter out the folder itself
+        .map(async file => {
+          const title = file.name
+            .replace('policies/', '')
+            .replace(/\.[^/.]+$/, '');
+          
+          // For now, just return the title. Content fetching can be added back later.
+          return {
+            id: file.name,
+            title: title,
+            content: `Policy document content for: ${title}`,
+          };
+        })
+    );
+    
+    return policies;
+  } catch (error) {
+    console.error("Error fetching policies from Firebase Storage:", error);
+    // Re-throw the error to be caught by the calling flow
+    throw new Error(`Failed to retrieve policies from storage. Please check configuration and permissions. Error: ${(error as Error).message}`);
+  }
 }
