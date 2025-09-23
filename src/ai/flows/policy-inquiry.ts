@@ -50,21 +50,26 @@ const policyInquiryFlow = ai.defineFlow(
     inputSchema: PolicyInquiryInputSchema,
     outputSchema: PolicyInquiryOutputSchema,
   },
-  async input => {
-    const policies = await getPolicies();
-    
-    // For debugging, let's just list the policy titles.
-    if (policies.length > 0) {
-      const policyTitles = policies.map(p => p.title).join(', ');
-      return { answer: `I found the following policy files: ${policyTitles}` };
+  async (input) => {
+    try {
+      const policies = await getPolicies();
+      
+      if (policies.length > 0) {
+        const policyTitles = policies.map(p => p.title).join(', ');
+        return { answer: `I found the following policy files: ${policyTitles}` };
+      }
+
+      const context = policies.map(p => `## ${p.title}\n${p.content}`).join('\n\n');
+
+      const {output} = await prompt({
+        query: input.query,
+        context: context,
+      });
+      return output!;
+
+    } catch (error: any) {
+      console.error("Error in policyInquiryFlow:", error);
+      return { answer: `There was an error connecting to the knowledge base. Please check the storage configuration and permissions. \n\n**Error Details:**\n\`\`\`\n${error.message}\n\`\`\`` };
     }
-
-    const context = policies.map(p => `## ${p.title}\n${p.content}`).join('\n\n');
-
-    const {output} = await prompt({
-      query: input.query,
-      context: context,
-    });
-    return output!;
   }
 );
