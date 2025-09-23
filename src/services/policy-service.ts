@@ -2,15 +2,15 @@
 
 import { storage } from '@/lib/firebase';
 import { ref, listAll, getBytes } from 'firebase/storage';
+// TODO: Add a compatible PDF parsing library to handle PDF files.
+// For example, using a library like 'pdf-parse' or another alternative.
+// import pdf from 'pdf-parse';
 
 export interface Policy {
   id: string;
   title: string;
   content: string;
 }
-
-// TODO: To re-enable PDF support, you will need to find a compatible
-// PDF parsing library and add the text extraction logic back here.
 
 export async function getPolicies(): Promise<Policy[]> {
   try {
@@ -22,9 +22,17 @@ export async function getPolicies(): Promise<Policy[]> {
         const bytes = await getBytes(itemRef);
         const buffer = Buffer.from(bytes);
         const title = itemRef.name.replace(/\.[^/.]+$/, "");
+        let content = '';
 
-        // Currently only supports text-based files.
-        const content = buffer.toString('utf-8');
+        if (itemRef.name.toLowerCase().endsWith('.pdf')) {
+          // Placeholder for PDF parsing logic.
+          // The buffer contains the PDF data.
+          // content = (await pdf(buffer)).text;
+          content = `(Content of ${itemRef.name} is a PDF and needs a parsing library to be read.)`;
+        } else {
+          // For text-based files
+          content = buffer.toString('utf-8');
+        }
 
         return {
           id: itemRef.name,
