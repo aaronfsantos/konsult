@@ -1,9 +1,10 @@
 'use client';
 
-import { User, Bot } from 'lucide-react';
+import { User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { FeedbackButtons } from './feedback-buttons';
+import { KonsultLogo } from './konsult-logo';
 
 export type Message = {
   role: 'user' | 'assistant';
@@ -29,7 +30,7 @@ export function ChatMessage({ message, isLoading = false }: ChatMessageProps) {
       {isAssistant && (
         <Avatar className="size-8 border">
           <AvatarFallback className="bg-primary text-primary-foreground">
-            <Bot className="size-5" />
+            <KonsultLogo className="size-5" />
           </AvatarFallback>
         </Avatar>
       )}
