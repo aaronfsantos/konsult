@@ -26,6 +26,7 @@ import {
 } from './ui/dropdown-menu';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { Button } from './ui/button';
+import { useEffect } from 'react';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -50,7 +51,19 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     },
   ];
 
-  if (loading) {
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+    if (!user && pathname !== '/login') {
+      router.push('/login');
+    }
+    if (user && pathname === '/login') {
+      router.push('/');
+    }
+  }, [user, loading, pathname, router]);
+
+  if (loading || (!user && pathname !== '/login') || (user && pathname === '/login')) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">
         <Loader2 className="size-8 animate-spin text-primary" />
@@ -58,20 +71,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user) {
-    if (pathname !== '/login') {
-       router.push('/login');
-    }
+  if (!user && pathname === '/login') {
     return <>{children}</>;
-  }
-  
-  if (pathname === '/login') {
-    router.push('/');
-    return (
-       <div className="flex h-screen w-screen items-center justify-center">
-        <Loader2 className="size-8 animate-spin text-primary" />
-      </div>
-    );
   }
 
   return (
@@ -114,7 +115,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                         <User className="size-5" />
                       </AvatarFallback>
                     </Avatar>
-                    <span className="truncate">{user.email}</span>
+                    <span className="truncate">{user?.email}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" side="right" align="end">
