@@ -31,7 +31,12 @@ const prompt = ai.definePrompt({
   name: 'summarizePolicyPrompt',
   input: {schema: SummarizePolicyInputSchema},
   output: {schema: SummarizePolicyOutputSchema},
-  prompt: `You are an expert policy summarizer.  You will be given a long policy document and you must summarize it into a concise summary that covers all the key points.  The summary should be no more than 200 words.\n\nPolicy Document: {{{policyDocument}}}`,
+  prompt: `You are an expert policy summarizer. You will be given a long policy document and you must summarize it into a concise summary that covers all the key points.
+
+The summary should be no more than 200 words and formatted as a clean, well-structured paragraph.
+
+Policy Document:
+{{{policyDocument}}}`,
 });
 
 const summarizePolicyFlow = ai.defineFlow(
