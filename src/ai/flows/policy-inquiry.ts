@@ -52,6 +52,13 @@ const policyInquiryFlow = ai.defineFlow(
   },
   async input => {
     const policies = await getPolicies();
+    
+    // For debugging, let's just list the policy titles.
+    if (policies.length > 0) {
+      const policyTitles = policies.map(p => p.title).join(', ');
+      return { answer: `I found the following policy files: ${policyTitles}` };
+    }
+
     const context = policies.map(p => `## ${p.title}\n${p.content}`).join('\n\n');
 
     const {output} = await prompt({
