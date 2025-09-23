@@ -2,15 +2,25 @@
 
 import { storage } from '@/lib/firebase';
 import { ref, listAll, getBytes } from 'firebase/storage';
-// TODO: Add a compatible PDF parsing library to handle PDF files.
-// For example, using a library like 'pdf-parse' or another alternative.
-// import pdf from 'pdf-parse';
+import PDFParser from 'pdf2json';
 
 export interface Policy {
   id: string;
   title: string;
   content: string;
 }
+
+async function parsePdf(buffer: Buffer): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const pdfParser = new PDFParser(null, 1);
+        pdfParser.on('pdfParser_dataError', (errData: any) => reject(errData.parserError));
+        pdfParser.on('pdfParser_dataReady', () => {
+            resolve((pdfParser as any).getRawTextContent());
+        });
+        pdfParser.parseBuffer(buffer);
+    });
+}
+
 
 export async function getPolicies(): Promise<Policy[]> {
   try {
@@ -25,10 +35,12 @@ export async function getPolicies(): Promise<Policy[]> {
         let content = '';
 
         if (itemRef.name.toLowerCase().endsWith('.pdf')) {
-          // Placeholder for PDF parsing logic.
-          // The buffer contains the PDF data.
-          // content = (await pdf(buffer)).text;
-          content = `(Content of ${itemRef.name} is a PDF and needs a parsing library to be read.)`;
+          try {
+            content = await parsePdf(buffer);
+          } catch (error) {
+            console.error(`Error parsing PDF ${itemRef.name}:`, error);
+            content = `(Could not parse the content of PDF file: ${itemRef.name})`;
+          }
         } else {
           // For text-based files
           content = buffer.toString('utf-8');

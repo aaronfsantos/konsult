@@ -39,7 +39,8 @@ const nextConfig: NextConfig = {
         };
     }
     return config;
-  }
+  },
+  serverComponentsExternalPackages: ['pdf2json']
 };
 
 export default nextConfig;
