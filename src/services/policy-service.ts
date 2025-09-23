@@ -1,6 +1,6 @@
 'use server';
 
-import { storage } from '@/lib/firebase-admin';
+import { firebaseAdmin, storage } from '@/lib/firebase-admin';
 import { Policy } from '@/models/policy';
 
 /**
