@@ -44,7 +44,7 @@ export function ChatMessage({ message, isLoading = false }: ChatMessageProps) {
           message.isError && 'bg-destructive text-destructive-foreground'
         )}
       >
-        <div className="prose prose-sm max-w-none text-inherit break-words whitespace-pre-line">
+        <div className="prose prose-sm max-w-none text-inherit break-words whitespace-pre-line font-chat">
           {isLoading ? (
              <div className="flex items-center gap-2">
                 <span className="h-2 w-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></span>

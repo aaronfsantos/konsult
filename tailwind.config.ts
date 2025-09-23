@@ -13,6 +13,7 @@ export default {
         body: ['Montserrat', 'sans-serif'],
         headline: ['Montserrat', 'sans-serif'],
         code: ['monospace'],
+        chat: ['Inter', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
