@@ -38,10 +38,6 @@ const nextConfig: NextConfig = {
             fs: false,
         };
     }
-    config.externals = [
-      ...config.externals,
-      'pdf-parse'
-    ];
     return config;
   }
 };

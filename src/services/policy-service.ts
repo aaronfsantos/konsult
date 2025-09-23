@@ -2,7 +2,6 @@
 
 import { storage } from '@/lib/firebase';
 import { ref, listAll, getBytes } from 'firebase/storage';
-import pdf from 'pdf-parse';
 
 export interface Policy {
   id: string;
@@ -10,10 +9,8 @@ export interface Policy {
   content: string;
 }
 
-async function extractTextFromPdf(pdfBuffer: Buffer): Promise<string> {
-  const data = await pdf(pdfBuffer);
-  return data.text;
-}
+// TODO: To re-enable PDF support, you will need to find a compatible
+// PDF parsing library and add the text extraction logic back here.
 
 export async function getPolicies(): Promise<Policy[]> {
   try {
@@ -24,14 +21,10 @@ export async function getPolicies(): Promise<Policy[]> {
       policySnapshot.items.map(async (itemRef) => {
         const bytes = await getBytes(itemRef);
         const buffer = Buffer.from(bytes);
-        let content = '';
         const title = itemRef.name.replace(/\.[^/.]+$/, "");
 
-        if (itemRef.name.toLowerCase().endsWith('.pdf')) {
-          content = await extractTextFromPdf(buffer);
-        } else {
-          content = buffer.toString('utf-8');
-        }
+        // Currently only supports text-based files.
+        const content = buffer.toString('utf-8');
 
         return {
           id: itemRef.name,
