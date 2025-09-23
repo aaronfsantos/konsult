@@ -32,11 +32,16 @@ const nextConfig: NextConfig = {
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
-        config.externals = {
-            ...config.externals,
-            'pdf-parse': 'pdf-parse',
+        // Fixes npm packages that depend on `fs` module
+        config.resolve.fallback = {
+            ...config.resolve.fallback,
+            fs: false,
         };
     }
+    config.externals = [
+      ...config.externals,
+      'pdf-parse'
+    ];
     return config;
   }
 };

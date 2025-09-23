@@ -1,0 +1,13 @@
+diff --git a/node_modules/pdf-parse/lib/pdf-parse.js b/node_modules/pdf-parse/lib/pdf-parse.js
+index 23ab915..921e51b 100644
+--- a/node_modules/pdf-parse/lib/pdf-parse.js
++++ b/node_modules/pdf-parse/lib/pdf-parse.js
+@@ -10,7 +10,6 @@
+ 
+ //see https://github.com/mozilla/pdf.js/blob/master/src/display/api.js
+ async function PDFJS(dataBuffer, options) {
+-  let isDebug = !!(options.debug);
+   let version = PDF_JS_VERSION;
+ 
+   // initializing all used v8 array buffers at once, to avoid side effects of buffer sharing across vm contexts.
+
