@@ -9,14 +9,28 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarInset,
+  SidebarFooter,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { BookOpen, FileText, MessageSquare } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { BookOpen, FileText, MessageSquare, LogOut, User, Loader2 } from 'lucide-react';
 import { KonsultLogo } from './konsult-logo';
+import { useAuth } from '@/hooks/use-auth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import { Avatar, AvatarFallback } from './ui/avatar';
+import { Button } from './ui/button';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { user, loading, signOut } = useAuth();
+  const router = useRouter();
 
   const menuItems = [
     {
@@ -35,6 +49,30 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       icon: BookOpen,
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    if (pathname !== '/login') {
+       router.push('/login');
+    }
+    return <>{children}</>;
+  }
+  
+  if (pathname === '/login') {
+    router.push('/');
+    return (
+       <div className="flex h-screen w-screen items-center justify-center">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>
@@ -67,6 +105,28 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             ))}
           </SidebarMenu>
         </SidebarContent>
+        <SidebarFooter>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="w-full justify-start gap-2 px-2">
+                   <Avatar className="size-8 border">
+                      <AvatarFallback className="bg-secondary text-secondary-foreground">
+                        <User className="size-5" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="truncate">{user.email}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" side="right" align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={signOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+        </SidebarFooter>
       </Sidebar>
       <SidebarInset>{children}</SidebarInset>
     </SidebarProvider>
