@@ -148,7 +148,7 @@ export default function SummarizePage() {
             )}
             {summary && (
               <ScrollArea className="h-full max-h-[400px] pr-4">
-                 <div className="prose prose-sm max-w-none break-words whitespace-pre-wrap">
+                 <div className="prose prose-sm max-w-none break-words whitespace-pre-line">
                     {summary}
                  </div>
                  <FeedbackButtons />
@@ -169,4 +169,3 @@ export default function SummarizePage() {
 function cn(...classes: (string | boolean | undefined | null)[]) {
   return classes.filter(Boolean).join(' ');
 }
-
