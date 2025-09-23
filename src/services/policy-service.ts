@@ -2,6 +2,23 @@
 
 import { firebaseAdmin, storage } from '@/lib/firebase-admin';
 import { Policy } from '@/models/policy';
+import PDFParser from 'pdf2json';
+
+async function parsePdf(buffer: Buffer): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const pdfParser = new (PDFParser as any)(null, 1);
+
+    pdfParser.on('pdfParser_dataError', (errData: any) =>
+      reject(new Error(errData.parserError))
+    );
+    pdfParser.on('pdfParser_dataReady', () => {
+      const text = pdfParser.getRawTextContent();
+      resolve(text);
+    });
+
+    pdfParser.parseBuffer(buffer);
+  });
+}
 
 /**
  * Fetches policies from Firebase Storage.
@@ -20,11 +37,28 @@ export async function getPolicies(): Promise<Policy[]> {
             .replace(/\.[^/.]+$/, '');
           
           const contentBuffer = (await file.download())[0];
+          let content = '';
+
+          if (file.name.toLowerCase().endsWith('.pdf')) {
+            try {
+              content = await parsePdf(contentBuffer);
+            } catch (pdfError) {
+              console.error(`Error parsing PDF file ${file.name}:`, pdfError);
+              // Return a policy with an error message in the content
+              return {
+                id: file.name,
+                title: title,
+                content: `Error: Could not read the content of the PDF file "${title}". It might be corrupted or in an unsupported format.`,
+              };
+            }
+          } else {
+            content = contentBuffer.toString('utf-8');
+          }
           
           return {
             id: file.name,
             title: title,
-            content: contentBuffer.toString('utf-8'),
+            content: content,
           };
         })
     );
