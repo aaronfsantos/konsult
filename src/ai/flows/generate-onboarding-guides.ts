@@ -49,6 +49,8 @@ const prompt = ai.definePrompt({
 
   If the project name looks like a Jira Project Key, use the getJiraProjectDetails tool to get more information about the project and use that to create a more detailed and useful onboarding guide.
 
+  Make sure to return a valid JSON object matching the output schema.
+
   Here is an example of a good onboarding guide:
 
   ---
