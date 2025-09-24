@@ -85,7 +85,9 @@ const prompt = ai.definePrompt({
 
   Role: {{{role}}}
   Projects: {{{projects}}}
-  Internal Documentation: {{{internalDocumentation}}}`,
+  Internal Documentation: {{{internalDocumentation}}}
+  
+  Onboarding Guide:`,
 });
 
 const generateOnboardingGuideFlow = ai.defineFlow(
