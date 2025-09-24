@@ -44,7 +44,7 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateOnboardingGuideOutputSchema},
   tools: [getJiraProjectDetailsTool],
   config: {
-    temperature: 1,
+    temperature: 0.2,
   },
   prompt: `You are an expert in creating onboarding guides for new employees.
 
@@ -80,7 +80,8 @@ const prompt = ai.definePrompt({
   ---
 
   Now, create a new onboarding guide based on the following details.
-  Ensure you use markdown for formatting and return a valid JSON object matching the output schema.
+  Return a valid JSON object matching the output schema.
+  Ensure you use markdown for formatting 
 
   Role: {{{role}}}
   Projects: {{{projects}}}
