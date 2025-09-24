@@ -43,6 +43,9 @@ const prompt = ai.definePrompt({
   input: {schema: GenerateOnboardingGuideInputSchema},
   output: {schema: GenerateOnboardingGuideOutputSchema},
   tools: [getJiraProjectDetailsTool],
+  config: {
+    temperature: 1,
+  },
   prompt: `You are an expert in creating onboarding guides for new employees.
 
   Based on the employee's role, the projects they will be working on, and the available internal documentation, create a step-by-step onboarding guide. Use markdown for formatting.
