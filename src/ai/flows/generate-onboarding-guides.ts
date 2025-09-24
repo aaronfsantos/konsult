@@ -49,7 +49,7 @@ const prompt = ai.definePrompt({
 
   If the project name looks like a Jira Project Key, use the getJiraProjectDetails tool to get more information about the project and use that to create a more detailed and useful onboarding guide.
 
-  Make sure to return a valid JSON object matching the output schema.
+  Return a valid JSON object matching the output schema.
 
   Here is an example of a good onboarding guide:
 
@@ -77,12 +77,11 @@ const prompt = ai.definePrompt({
   ---
 
   Now, create a new onboarding guide based on the following details.
+  Ensure you use markdown for formatting and return a valid JSON object matching the output schema.
 
   Role: {{{role}}}
   Projects: {{{projects}}}
-  Internal Documentation: {{{internalDocumentation}}}
-
-  Onboarding Guide:`,
+  Internal Documentation: {{{internalDocumentation}}}`,
 });
 
 const generateOnboardingGuideFlow = ai.defineFlow(
