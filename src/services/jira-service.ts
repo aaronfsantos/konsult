@@ -64,8 +64,8 @@ export async function getJiraProjectDetails(projectKey: string): Promise<JiraPro
 
   // Returning mock data for now
   return Promise.resolve({
-    name: `Awesome Project "${projectKey}"`,
-    description: `This is a mock description for project ${projectKey}. It's a fantastic project focused on AI innovation.`,
-    lead: 'Dr. AI',
+    name: `Project "${projectKey}"`,
+    description: `This is a mock description for project ${projectKey}. This is a project to manage internal tasks.`,
+    lead: 'Project Lead',
   });
 }

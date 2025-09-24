@@ -17,6 +17,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useDropzone } from 'react-dropzone';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import * as mammoth from 'mammoth';
+import ReactMarkdown from 'react-markdown';
 
 const formSchema = z.object({
   role: z.string().min(2, { message: 'Role must be at least 2 characters.' }),
@@ -43,7 +45,7 @@ export default function OnboardingPage() {
   const onDrop = useCallback((acceptedFiles: File[], fileRejections: any[]) => {
     setFileError('');
     if (fileRejections.length > 0) {
-      setFileError('File is too large or not a valid type. Please upload a text file under 2MB.');
+      setFileError('File is too large or not a valid type. Please upload a supported file under 2MB.');
       setFileName('');
       form.setValue('internalDocumentation', '');
       return;
@@ -53,16 +55,37 @@ export default function OnboardingPage() {
       const file = acceptedFiles[0];
       setFileName(file.name);
       const reader = new FileReader();
-      reader.onload = (event) => {
-        const text = event.target?.result as string;
-        form.setValue('internalDocumentation', text);
+
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target?.result;
+          if (arrayBuffer instanceof ArrayBuffer) {
+            let text;
+            if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                const result = await mammoth.extractRawText({ arrayBuffer });
+                text = result.value;
+            } else {
+                text = new TextDecoder().decode(arrayBuffer);
+            }
+            form.setValue('internalDocumentation', text);
+          } else {
+            throw new Error('Failed to read file as ArrayBuffer.');
+          }
+        } catch (readError) {
+          console.error('Error processing file:', readError);
+          setFileError('Error reading or parsing file.');
+          setFileName('');
+          form.setValue('internalDocumentation', '');
+        }
       };
+
       reader.onerror = () => {
         setFileError('Error reading file.');
         setFileName('');
         form.setValue('internalDocumentation', '');
       };
-      reader.readAsText(file);
+      
+      reader.readAsArrayBuffer(file);
     }
   }, [form]);
 
@@ -70,6 +93,7 @@ export default function OnboardingPage() {
     onDrop,
     accept: {
       'text/plain': ['.txt', '.md'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
     maxSize: 2 * 1024 * 1024, // 2MB
     multiple: false,
@@ -186,7 +210,7 @@ export default function OnboardingPage() {
                           <div className="text-center text-muted-foreground">
                             <UploadCloud className="mx-auto h-8 w-8"/>
                             <p className="mt-2 text-sm font-semibold">Drop a file here or click to browse</p>
-                            <p className="text-xs">Supports: .txt, .md (max. 2MB)</p>
+                            <p className="text-xs">Supports: .txt, .md, .docx (max. 2MB)</p>
                           </div>
                         )}
                       </div>
@@ -232,8 +256,8 @@ export default function OnboardingPage() {
             )}
             {guide && (
               <ScrollArea className="h-full max-h-[500px] pr-4">
-                 <div className="prose prose-sm max-w-none break-words whitespace-pre-wrap">
-                    {guide}
+                 <div className="prose prose-sm max-w-none break-words">
+                    <ReactMarkdown>{guide}</ReactMarkdown>
                  </div>
                  <FeedbackButtons />
               </ScrollArea>
