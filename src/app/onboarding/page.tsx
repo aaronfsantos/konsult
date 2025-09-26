@@ -4,21 +4,22 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { generateOnboardingGuide as runGenerateOnboardingGuide } from '@/ai/flows/generate-onboarding-guides';
+import { generateOnboardingGuide as runGenerateOnboardingGuide, type GenerateOnboardingGuideOutput } from '@/ai/flows/generate-onboarding-guides';
 import { onboardingChat as runOnboardingChat } from '@/ai/flows/onboarding-chat';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Loader2, BookOpen, UploadCloud, FileText, CornerDownLeft, Bot, User } from 'lucide-react';
+import { Loader2, BookOpen, UploadCloud, FileText, CornerDownLeft, Bot, User, Info } from 'lucide-react';
 import { FeedbackButtons } from '@/components/feedback-buttons';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useDropzone } from 'react-dropzone';
 import { cn } from '@/lib/utils';
 import * as mammoth from 'mammoth';
-import ReactMarkdown from 'react-markdown';
 import { ChatMessage, type Message } from '@/components/chat-message';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const formSchema = z.object({
   role: z.string().min(2, { message: 'Role must be at least 2 characters.' }),
@@ -26,8 +27,24 @@ const formSchema = z.object({
   internalDocumentation: z.string().optional(),
 });
 
+type Task = {
+  id: string;
+  text: string;
+  completed: boolean;
+};
+
+type GuideSection = {
+  title: string;
+  tasks: Task[];
+};
+
+type Guide = GenerateOnboardingGuideOutput & {
+  sections: GuideSection[];
+};
+
+
 export default function OnboardingPage() {
-  const [guide, setGuide] = useState('');
+  const [guide, setGuide] = useState<Guide | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [fileName, setFileName] = useState('');
@@ -108,7 +125,7 @@ export default function OnboardingPage() {
   async function onGuideSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setError('');
-    setGuide('');
+    setGuide(null);
     setChatMessages([]);
 
     try {
@@ -117,13 +134,50 @@ export default function OnboardingPage() {
         projects: values.projects,
         internalDocumentation: values.internalDocumentation || 'No specific documentation provided.',
       });
-      setGuide(result.guide);
+      
+      const interactiveGuide: Guide = {
+        ...result,
+        sections: result.sections.map(section => ({
+          ...section,
+          tasks: section.tasks.map((task, index) => ({
+            ...task,
+            id: `task-${section.title.replace(/\s+/g, '-')}-${index}`,
+            completed: false,
+          })),
+        })),
+      };
+
+      setGuide(interactiveGuide);
+
     } catch (e) {
       console.error('Error generating guide:', e);
       setError('An error occurred while generating the guide. Please try again.');
     } finally {
       setIsLoading(false);
     }
+  }
+
+  const handleTaskToggle = (sectionIndex: number, taskIndex: number) => {
+    if (!guide) return;
+  
+    const newSections = [...guide.sections];
+    newSections[sectionIndex].tasks[taskIndex].completed = !newSections[sectionIndex].tasks[taskIndex].completed;
+  
+    setGuide({ ...guide, sections: newSections });
+  };
+  
+  const getGuideAsText = () => {
+    if (!guide) return '';
+    let guideText = `# ${guide.title}\n\n`;
+    guide.sections.forEach(section => {
+        guideText += `## ${section.title}\n`;
+        section.tasks.forEach(task => {
+            guideText += `- [${task.completed ? 'x' : ' '}] ${task.text}\n`;
+        });
+        guideText += '\n';
+    });
+    guideText += `## Reporting Progress\n${guide.progressReport}\n`;
+    return guideText;
   }
 
   const handleChatSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -136,7 +190,8 @@ export default function OnboardingPage() {
     setIsChatLoading(true);
 
     try {
-        const result = await runOnboardingChat({ query: chatInput, guideContext: guide });
+        const guideContext = getGuideAsText();
+        const result = await runOnboardingChat({ query: chatInput, guideContext: guideContext });
         const assistantMessage: Message = {
             role: 'assistant',
             content: result.answer,
@@ -246,17 +301,51 @@ export default function OnboardingPage() {
             </CardContent>
             </Card>
 
+            {isLoading && (
+              <Card className="flex flex-col flex-1 items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="mt-2 text-muted-foreground">Generating your interactive guide...</p>
+              </Card>
+            )}
+
             {guide && (
                 <Card className="flex flex-col flex-1">
                     <CardHeader>
-                        <CardTitle>Project Guidelines</CardTitle>
-                        <CardDescription>The generated step-by-step guide for the new hire.</CardDescription>
+                        <CardTitle>{guide.title}</CardTitle>
+                        <CardDescription>An interactive, step-by-step guide for the new hire.</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-1">
                         <ScrollArea className="h-full max-h-[400px] pr-4">
-                            <div className="prose prose-sm max-w-none break-words">
-                                <ReactMarkdown>{guide}</ReactMarkdown>
-                            </div>
+                           <Accordion type="multiple" defaultValue={guide.sections.map(s => s.title)} className="w-full">
+                                {guide.sections.map((section, sectionIndex) => (
+                                <AccordionItem value={section.title} key={sectionIndex}>
+                                    <AccordionTrigger>{section.title}</AccordionTrigger>
+                                    <AccordionContent>
+                                    <div className="space-y-2">
+                                        {section.tasks.map((task, taskIndex) => (
+                                        <div key={task.id} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id={task.id}
+                                                checked={task.completed}
+                                                onCheckedChange={() => handleTaskToggle(sectionIndex, taskIndex)}
+                                            />
+                                            <label htmlFor={task.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                                {task.text}
+                                            </label>
+                                        </div>
+                                        ))}
+                                    </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                                ))}
+                            </Accordion>
+                            <Alert className="mt-4">
+                                <Info className="h-4 w-4" />
+                                <AlertTitle>How to Report Progress</AlertTitle>
+                                <AlertDescription>
+                                    {guide.progressReport}
+                                </AlertDescription>
+                            </Alert>
                         </ScrollArea>
                     </CardContent>
                 </Card>

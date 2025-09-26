@@ -25,8 +25,19 @@ export type GenerateOnboardingGuideInput = z.infer<
   typeof GenerateOnboardingGuideInputSchema
 >;
 
+const TaskSchema = z.object({
+  text: z.string().describe('The text content of the task.'),
+});
+
+const GuideSectionSchema = z.object({
+  title: z.string().describe('The title of the onboarding section (e.g., "Week 1: Getting Set Up").'),
+  tasks: z.array(TaskSchema).describe('A list of tasks for this section.'),
+});
+
 const GenerateOnboardingGuideOutputSchema = z.object({
-  guide: z.string().describe('The generated step-by-step onboarding guide in Markdown format.'),
+  title: z.string().describe('The main title of the onboarding guide.'),
+  sections: z.array(GuideSectionSchema).describe('An array of sections that make up the guide.'),
+  progressReport: z.string().describe('Instructions on how the new hire should report their progress.'),
 });
 export type GenerateOnboardingGuideOutput = z.infer<
   typeof GenerateOnboardingGuideOutputSchema
@@ -48,44 +59,42 @@ const prompt = ai.definePrompt({
   },
   prompt: `You are an expert in creating onboarding guides for new employees.
 
-  Based on the employee's role, the projects they will be working on, and the available internal documentation, create a step-by-step onboarding guide. Use markdown for formatting. The guide should include tasks with checkboxes for progress tracking. Also, add a section explaining how the new hire should report their progress to their Manager, Team Lead, or HR.
+  Based on the employee's role, the projects they will be working on, and the available internal documentation, create a structured onboarding guide.
 
+  The guide should be broken down into logical sections (e.g., by week or by topic). Each section should have a title and a list of specific tasks.
+  
+  Also, include a separate instruction on how the new hire should report their progress to their Manager, Team Lead, or HR.
+  
   If the project name looks like a Jira Project Key, use the getJiraProjectDetails tool to get more information about the project and use that to create a more detailed and useful onboarding guide.
+  
+  Return a valid JSON object matching the output schema. Do not return markdown.
 
-  Return a valid JSON object matching the output schema.
-
-  Here is an example of a good onboarding guide:
-
+  Here is an example of the desired JSON output structure:
+  {
+    "title": "Onboarding Guide: Junior Software Engineer",
+    "sections": [
+      {
+        "title": "Week 1: Getting Set Up",
+        "tasks": [
+          { "text": "Meet the Team: Introduction to your manager and team members." },
+          { "text": "Hardware Setup: Get your laptop and peripherals from IT." },
+          { "text": "Account Access: Ensure you have access to critical systems (Email, Slack, Jira, GitHub)." }
+        ]
+      },
+      {
+        "title": "Week 1: Development Environment",
+         "tasks": [
+          { "text": "Install Software: Follow the 'Dev Environment Setup' guide on the company wiki." },
+          { "text": "Clone Repositories: Clone the main repositories for the 'Phoenix Project'." }
+        ]
+      }
+    ],
+    "progressReport": "At the end of each week, send a summary of your progress to your manager and team lead."
+  }
   ---
-  # Onboarding Guide: Junior Software Engineer
-
-  Welcome to the team! This guide will help you get started during your first few weeks.
-
-  ## Week 1: Getting Set Up
-
-  ### Day 1: Welcome & Setup
-  - [ ] **Meet the Team:** Introduction to your manager and team members.
-  - [ ] **Hardware Setup:** Get your laptop and peripherals from IT.
-  - [ ] **Account Access:** Ensure you have access to critical systems (Email, Slack, Jira, GitHub).
-
-  ### Day 2-3: Development Environment
-  - [ ] **Install Software:** Follow the "Dev Environment Setup" guide on the company wiki.
-  - [ ] **Clone Repositories:** Clone the main repositories for the 'Phoenix Project'.
-  - [ ] **Run the Project:** Get the project running on your local machine. Pair with a teammate if you run into issues.
-
-  ### Day 4-5: Introduction to the Project
-  - [ ] **Project Overview:** Your manager will walk you through the architecture of the 'Phoenix Project'.
-  - [ ] **Review Documentation:** Read the project's README and any linked documentation.
-  - [ ] **Your First Ticket:** Pick up a simple "good first issue" ticket from Jira to get familiar with the contribution workflow.
-
-  ## Reporting Progress
-  Please check off the tasks as you complete them. At the end of each week, send a summary of your progress to your manager and team lead.
-
-  ---
-
+  
   Now, create a new onboarding guide based on the following details.
   Make sure to return a valid JSON object matching the output schema.
-  Ensure you use markdown for formatting.
 
   Role: {{{role}}}
   Projects: {{{projects}}}
