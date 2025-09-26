@@ -26,7 +26,7 @@ export type GenerateOnboardingGuideInput = z.infer<
 >;
 
 const GenerateOnboardingGuideOutputSchema = z.object({
-  guide: z.string().describe('The generated step-by-step onboarding guide.'),
+  guide: z.string().describe('The generated step-by-step onboarding guide in Markdown format.'),
 });
 export type GenerateOnboardingGuideOutput = z.infer<
   typeof GenerateOnboardingGuideOutputSchema
@@ -48,7 +48,7 @@ const prompt = ai.definePrompt({
   },
   prompt: `You are an expert in creating onboarding guides for new employees.
 
-  Based on the employee's role, the projects they will be working on, and the available internal documentation, create a step-by-step onboarding guide. Use markdown for formatting.
+  Based on the employee's role, the projects they will be working on, and the available internal documentation, create a step-by-step onboarding guide. Use markdown for formatting. The guide should include tasks with checkboxes for progress tracking. Also, add a section explaining how the new hire should report their progress to their Manager, Team Lead, or HR.
 
   If the project name looks like a Jira Project Key, use the getJiraProjectDetails tool to get more information about the project and use that to create a more detailed and useful onboarding guide.
 
@@ -77,11 +77,15 @@ const prompt = ai.definePrompt({
   - [ ] **Project Overview:** Your manager will walk you through the architecture of the 'Phoenix Project'.
   - [ ] **Review Documentation:** Read the project's README and any linked documentation.
   - [ ] **Your First Ticket:** Pick up a simple "good first issue" ticket from Jira to get familiar with the contribution workflow.
+
+  ## Reporting Progress
+  Please check off the tasks as you complete them. At the end of each week, send a summary of your progress to your manager and team lead.
+
   ---
 
   Now, create a new onboarding guide based on the following details.
-  Return a valid JSON object matching the output schema.
-  Ensure you use markdown for formatting 
+  Make sure to return a valid JSON object matching the output schema.
+  Ensure you use markdown for formatting.
 
   Role: {{{role}}}
   Projects: {{{projects}}}
