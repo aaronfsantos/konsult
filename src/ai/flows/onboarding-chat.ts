@@ -56,7 +56,11 @@ const onboardingChatFlow = ai.defineFlow(
         outputSchema: OnboardingChatOutputSchema,
     },
     async (input) => {
-        const {output} = await prompt(input);
-        return output!;
+        try {
+            const {output} = await prompt(input);
+            return output!;
+        } catch(e){
+            return { answer: "Sorry there was an error processing your request." }; // Corrected to return outputSchema type
+        }
     }
 );

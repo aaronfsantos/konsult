@@ -267,7 +267,7 @@ export default function OnboardingPage() {
                       )}
                     />
                     <FormItem>
-                        <FormLabel>Internal Documentation (Optional)</FormLabel>
+                        <FormLabel>Internal Documentation</FormLabel>
                         <div {...getRootProps()} className={cn('relative w-full p-4 flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer transition-colors', isDragActive ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50')}>
                             <input {...getInputProps()} />
                             {fileName ? (

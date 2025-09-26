@@ -71,7 +71,7 @@ const policyInquiryFlow = ai.defineFlow(
     } catch (error: any)
       {
       console.error("Error in policyInquiryFlow:", error);
-      return { answer: `There was an error connecting to the knowledge base. Please check the storage configuration and permissions. \n\n**Error Details:**\n\`\`\`\n${error.message}\n\`\`\`` };
+      return { answer: `Sorry I'm busy at the moment, please try again later...` };
     }
   }
 );
