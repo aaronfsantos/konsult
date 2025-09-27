@@ -20,6 +20,7 @@ import * as mammoth from 'mammoth';
 import { ChatMessage, type Message } from '@/components/chat-message';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Checkbox } from '@/components/ui/checkbox';
+import { OnboardingProgress } from '@/components/onboarding-progress';
 
 const formSchema = z.object({
   role: z.string().min(2, { message: 'Role must be at least 2 characters.' }),
@@ -229,6 +230,8 @@ export default function OnboardingPage() {
         <h1 className="text-3xl font-bold font-headline">Onboarding Assistant</h1>
         <p className="text-muted-foreground">Generate a new hire guide and ask questions about it.</p>
       </header>
+
+      <OnboardingProgress />
 
       <div className="grid md:grid-cols-2 gap-6 flex-1">
         <div className="flex flex-col gap-6">
