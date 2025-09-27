@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { BookOpen, FileText, MessageSquare, LogOut, User, Loader2 } from 'lucide-react';
+import { BookOpen, FileText, MessageSquare, LogOut, User, Loader2, LayoutDashboard, HelpCircle } from 'lucide-react';
 import { KonsultLogo } from './konsult-logo';
 import { useAuth } from '@/hooks/use-auth';
 import {
@@ -48,6 +48,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       href: '/onboarding',
       label: 'Onboarding Guides',
       icon: BookOpen,
+    },
+    {
+      href: '/manager-dashboard',
+      label: 'Manager Dashboard',
+      icon: LayoutDashboard,
+    },
+    {
+      href: '/faq',
+      label: 'FAQs',
+      icon: HelpCircle,
     },
   ];
 
