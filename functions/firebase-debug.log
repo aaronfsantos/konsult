@@ -1,0 +1,83 @@
+[debug] [2025-09-27T07:32:45.968Z] ----------------------------------------------------------------------
+[debug] [2025-09-27T07:32:45.970Z] Command:       /Users/zero/.nvm/versions/node/v20.17.0/bin/node /Users/zero/.nvm/versions/node/v20.17.0/bin/firebase emulators:start --only functions
+[debug] [2025-09-27T07:32:45.970Z] CLI Version:   14.15.1
+[debug] [2025-09-27T07:32:45.970Z] Platform:      darwin
+[debug] [2025-09-27T07:32:45.970Z] Node Version:  v20.17.0
+[debug] [2025-09-27T07:32:45.970Z] Time:          Sat Sep 27 2025 15:32:45 GMT+0800 (Philippine Standard Time)
+[debug] [2025-09-27T07:32:45.970Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-09-27T07:32:46.049Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-27T07:32:46.049Z] > authorizing via signed-in user (jiro.isaac@kollab.com)
+[info] i  emulators: Starting emulators: functions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: functions"}}
+[debug] [2025-09-27T07:32:46.372Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-09-27T07:32:46.372Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2025-09-27T07:32:46.373Z] [hub] writing locator at /var/folders/34/by1zklt53t1ghn6sv9l58ft80000gn/T/hub-klb-cd-konsult-dev-1.json
+[debug] [2025-09-27T07:32:46.663Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-09-27T07:32:46.663Z] [eventarc] Eventarc Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-09-27T07:32:46.663Z] [tasks] Cloud Tasks Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-09-27T07:32:46.663Z] late-assigned ports for functions and eventarc emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"functions":[{"address":"127.0.0.1","family":"IPv4","port":5001}],"eventarc":[{"address":"127.0.0.1","family":"IPv4","port":9299}],"tasks":[{"address":"127.0.0.1","family":"IPv4","port":9499}]},"metadata":{"message":"late-assigned ports for functions and eventarc emulators"}}
+[warn] ⚠  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: apphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect {"metadata":{"emulator":{"name":"functions"},"message":"The following emulators are not running, calls to these services from the Functions emulator will affect production: \u001b[1mapphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect\u001b[22m"}}
+[warn] ⚠  functions: Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful! {"metadata":{"emulator":{"name":"functions"},"message":"Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful!"}}
+[debug] [2025-09-27T07:32:47.349Z] Checked if tokens are valid: false, expires at: 1758901540889
+[debug] [2025-09-27T07:32:47.350Z] Checked if tokens are valid: false, expires at: 1758901540889
+[debug] [2025-09-27T07:32:47.350Z] > refreshing access token with scopes: []
+[debug] [2025-09-27T07:32:47.350Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-27T07:32:47.350Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-27T07:32:47.511Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-27T07:32:47.511Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-27T07:32:47.523Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/klb-cd-konsult-dev-1/adminSdkConfig [none]
+[debug] [2025-09-27T07:32:48.313Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/klb-cd-konsult-dev-1/adminSdkConfig 200
+[debug] [2025-09-27T07:32:48.313Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/klb-cd-konsult-dev-1/adminSdkConfig {"projectId":"klb-cd-konsult-dev-1","storageBucket":"klb-cd-konsult-dev-1.firebasestorage.app"}
+[info] i  functions: Watching "/Users/zero/Documents/kollab/projects/konsult/functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"/Users/zero/Documents/kollab/projects/konsult/functions\" for Cloud Functions..."}}
+[debug] [2025-09-27T07:32:48.334Z] Validating nodejs source
+[debug] [2025-09-27T07:32:48.952Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@google-cloud/vertexai": "^1.10.0",
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.0.1"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[debug] [2025-09-27T07:32:48.952Z] Building nodejs source
+[debug] [2025-09-27T07:32:48.953Z] Failed to find version of module node: reached end of search path /Users/zero/Documents/kollab/projects/konsult/functions/node_modules
+[info] ✔  functions: Using node@20 from host. 
+[debug] [2025-09-27T07:32:48.954Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-09-27T07:32:48.958Z] Found firebase-functions binary at '/Users/zero/Documents/kollab/projects/konsult/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8995
+
+[debug] [2025-09-27T07:32:49.812Z] Got response from /__/functions.yaml {"endpoints":{"parseOnboardingDoc":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"callableTrigger":{},"entryPoint":"parseOnboardingDoc"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[info] ✔  functions: Loaded functions definitions from source: parseOnboardingDoc. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: parseOnboardingDoc."}}
+[info] ✔  functions[us-central1-parseOnboardingDoc]: http function initialized (http://127.0.0.1:5001/klb-cd-konsult-dev-1/us-central1/parseOnboardingDoc). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/klb-cd-konsult-dev-1/us-central1/parseOnboardingDoc)."}}
+[debug] [2025-09-27T07:32:54.836Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌───────────┬────────────────┬─────────────────────────────────┐
+│ Emulator  │ Host:Port      │ View in Emulator UI             │
+├───────────┼────────────────┼─────────────────────────────────┤
+│ Functions │ 127.0.0.1:5001 │ http://127.0.0.1:4000/functions │
+└───────────┴────────────────┴─────────────────────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 

@@ -52,6 +52,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { OnboardingProgress } from '@/components/onboarding-progress';
 import { Checklist } from '@/components/checklist';
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 const formSchema = z.object({
   role: z.string().min(2, { message: 'Role must be at least 2 characters.' }),
@@ -75,6 +76,19 @@ type GuideSection = {
 type Guide = GenerateOnboardingGuideOutput & {
   sections: GuideSection[];
 };
+
+const functions = getFunctions();
+const parseOnboardingDoc = httpsCallable(functions, "parseOnboardingDoc");
+
+async function handleFileProcessed(text: string, project: string) {
+  try {
+    const result = await parseOnboardingDoc({ content: text, project });
+    const data = result.data as { tasks?: any };
+    console.log("Tasks saved:", data.tasks);
+  } catch (err) {
+    console.error("Error calling parseOnboardingDoc:", err);
+  }
+}
 
 export default function OnboardingPage() {
   const [guide, setGuide] = useState<Guide | null>(null);
@@ -117,18 +131,31 @@ export default function OnboardingPage() {
         reader.onload = async (event) => {
           try {
             const arrayBuffer = event.target?.result;
+            // if (arrayBuffer instanceof ArrayBuffer) {
+            //   let text;
+            //   if (
+            //     file.type ===
+            //     'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            //   ) {
+            //     const result = await mammoth.extractRawText({ arrayBuffer });
+            //     text = result.value;
+            //   } else {
+            //     text = new TextDecoder().decode(arrayBuffer);
+            //   }
+            //   form.setValue('internalDocumentation', text);
             if (arrayBuffer instanceof ArrayBuffer) {
               let text;
-              if (
-                file.type ===
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-              ) {
+              if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
                 const result = await mammoth.extractRawText({ arrayBuffer });
                 text = result.value;
               } else {
                 text = new TextDecoder().decode(arrayBuffer);
               }
+
               form.setValue('internalDocumentation', text);
+
+              // Call Vertex AI Cloud Function
+              await handleFileProcessed(text, form.getValues("projects"));
             } else {
               throw new Error('Failed to read file as ArrayBuffer.');
             }

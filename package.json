@@ -42,7 +42,7 @@
     "dotenv": "^16.4.5",
     "embla-carousel-react": "^8.6.0",
     "firebase": "^10.12.3",
-    "firebase-admin": "^12.3.0",
+    "firebase-admin": "^12.7.0",
     "genkit": "^1.14.1",
     "lucide-react": "^0.475.0",
     "mammoth": "^1.8.0",
